@@ -1,0 +1,72 @@
+class MazeGame:
+    def __init__(self, rows, cols, maze_layout, movement_path):
+        self.rows = rows
+        self.cols = cols
+        self.maze_layout = maze_layout
+        self.movement_path = movement_path
+        self.stack = []
+
+        self.player_position = None
+        self.obstacle_position = None
+        self.endpoint_position = None
+
+        self.parse_maze_layout()
+
+    def parse_maze_layout(self):
+        for i in range(self.rows):
+            for j in range(self.cols):
+                if self.maze_layout[i][j] == "P":
+                    self.player_position = (i, j)
+                elif self.maze_layout[i][j] == "E":
+                    self.endpoint_position = (i, j)
+                elif self.maze_layout[i][j] == "X":
+                    self.obstacle_position = (i, j)
+
+    def is_valid_move(self, row, col):
+        return 0 <= row < self.rows and 0 <= col < self.cols and self.maze_layout[row][col] != "1"
+
+    def play_game(self):
+        for move in self.movement_path:
+            if move.lower() in ('w', 's', 'a', 'd'):  # Valid moves
+                row, col = self.player_position
+
+                if move.lower() == 'w':
+                    row -= 1
+                elif move.lower() == 's':
+                    row += 1
+                elif move.lower() == 'a':
+                    col -= 1
+                elif move.lower() == 'd':
+                    col += 1
+
+                if self.is_valid_move(row, col):
+                    self.stack.append(self.player_position)
+                    self.player_position = (row, col)
+            elif move.lower() == 'b' and self.stack:  # Undo the previous step
+                self.player_position = self.stack.pop()
+
+            if self.player_position == self.obstacle_position:
+                print("Game Over - You collided with the obstacle!")
+                return
+            elif self.player_position == self.endpoint_position:
+                print("Congratulations! You reached the endpoint!")
+                return
+
+        print("You didn't reach the endpoint.")
+
+
+# Input data (example ) 
+maze_data = [
+    ["P", "0", "0", "1", "0"],
+    ["1", "1", "0", "1", "0"],
+    ["X", "0", "0", "0", "0"],
+    ["0", "1", "1", "1", "0"],
+    ["0", "0", "0", "0", "E"]
+]
+movement_input = "ddssbbssddss"
+
+rows, cols = 5, 5
+
+# Create and play the game
+game = MazeGame(rows, cols, maze_data, movement_input)
+game.play_game()
