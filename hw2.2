@@ -1,0 +1,27 @@
+def start_checkout(cashiers, customer):
+    cashier_idx, checkout_time = min(enumerate(cashiers), key=lambda x: x[1])
+    cashiers[cashier_idx] += customer
+    print(f"Cashier {cashier_idx + 1} is checking out Customer {customer}")
+
+def simulate_checkout(n, checkout_times, m):
+    cashiers = [0] * n
+    queue = list(range(1, m + 1))
+
+    time = 0
+    while queue or any(time < checkout_times[i] for i in range(n)):
+        for i in range(n):
+            if time >= checkout_times[i] and cashiers[i] > 0:
+                print(f"Cashier {i + 1} has finished checking out for Customer {cashiers[i]}")
+                cashiers[i] = 0
+
+        for i in range(n):
+            if time >= checkout_times[i] and cashiers[i] == 0 and queue:
+                start_checkout(cashiers, queue.pop(0))
+
+        time += 1
+
+# Example input
+n = 2
+checkout_times = [1, 5]
+m = 7
+simulate_checkout(n, checkout_times, m)
